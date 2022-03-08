@@ -16,7 +16,7 @@ int planA(struct SnakeMap* map, struct SnakeRelevant* absnake, int now_dir) {
 	if (absnake->x_FoodHead == 0)
 		result = absnake->y_FoodHead > 0 ? up : down;
 	return result;
-}
+		}
 
 int NoDie(struct SnakeMap* map, struct SnakeRelevant* absnake, int now_dir) {
 
@@ -40,7 +40,18 @@ int NoDie(struct SnakeMap* map, struct SnakeRelevant* absnake, int now_dir) {
 	case 9:
 		now_dir = absnake->x_FoodHead ? right : left;
 		break;
-	}
+}
 	return now_dir;
 
+int ReturnTheMinCost(struct SnakeMap* map) {
+	int min = s;
+	int result = 0;
+	for (int i = 0; i < s; i++)
+		if (map[i].op && min > map[i].cost) {
+			int temp = min;
+			min = map[i].cost;
+			map[i].cost = temp;
+			result = i;
+		}
+	return result;
 }

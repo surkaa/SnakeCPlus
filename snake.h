@@ -10,7 +10,8 @@
 #include<math.h>
 
 //Snake Game
-#define x					50	
+#define s					1500
+#define x					50
 #define s					1500
 #define xx					(x + 2)
 #define ss					(s + 2 * (xx + s / x))
@@ -45,6 +46,8 @@ struct SnakeMap
 {
 	int adr;
 	int dir;
+	int op;			//op: 0未访问  1边界已访问  -1已访问
+	int cost;
 };
 
 struct SnakeRelevant
