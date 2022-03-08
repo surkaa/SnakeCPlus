@@ -10,7 +10,7 @@ void InitGame() {
 		else {
 			Map[i].adr = i <= n + xx ? SnakeBody : none;
 			Map[i].dir = i <= n + xx ? right : unkown;
-		}
+	}
 	}
 	absnake.head = n + xx;
 	absnake.tail = 1 + xx;
@@ -46,7 +46,11 @@ bool CheakSnakeSafety()
 	if (Map[NextSquare].adr == none || Map[NextSquare].adr ==apple || NextSquare == absnake.tail)
 		return true;
 
-	return false;
+	int NextSquare = absnake.head + absnake.tempdir;
+	if (Map[NextSquare].adr == SnakeBody && NextSquare != absnake.tail)
+		return false;
+
+	return true;
 }
 
 void DrewSnake() {

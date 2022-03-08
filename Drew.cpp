@@ -21,6 +21,13 @@ void DISPLAY_DESK() {
 
 }
 
+void DrewSnake_Game_Interface() {
+	setlinecolor(RED);
+	setlinestyle(PS_SOLID, 3);
+	rectangle(x0, y0, PixelSnakeWidth + x0,
+		PixelSnakeHigh + y0);
+	cleardevice();
+}
 
 void fnDrawSnakeBody(struct SnakeMap* map, struct SnakeRelevant* absnake) {
 	//«Â∆¡
