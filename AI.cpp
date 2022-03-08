@@ -40,7 +40,7 @@ int NoDie(struct SnakeMap* map, struct SnakeRelevant* absnake, int now_dir) {
 	case 9:
 		now_dir = absnake->x_FoodHead ? right : left;
 		break;
-	}
+}
 	return now_dir;
 }
 int ReturnTheMinCost(struct SnakeMap* map) {
