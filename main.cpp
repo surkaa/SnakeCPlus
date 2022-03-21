@@ -1,18 +1,21 @@
 /************************************
  * 游戏：AI贪吃蛇
- * 作者：Sur_kaa<suralcarywn@qq.com>
+ * 作者：Sur_kaa <suralcarywn@qq.com>
  * 编译环境：visual studio 2022
- * 最后修改：2022年3月5日
+ * 最后修改：2022年3月20日
  ************************************/
 #include"snake.h"
-int main()
+int main(void)
 {
 	srand((unsigned int)time(NULL));
 	DISPLAY_DESK();
 	switch (SELECT())
 	{
-	case '0':
-		DEBUGAlpha();
+	case'd':case'D':
+		DEBUGAlpha(true);
+		break;
+	case's':case'S':
+		DEBUGAlpha(false);
 		break;
 	case'a':case'A':case'1':
 		SnakeGame(false);
@@ -25,5 +28,4 @@ int main()
 		break;
 	}
 	closegraph();
-	return 0;
 }
