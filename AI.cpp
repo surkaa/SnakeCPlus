@@ -1,22 +1,22 @@
 #include"snake.h"
 
 //11.86  1500  50
-//×ª½ÇÎÊÌâ
+//è½¬è§’é—®é¢˜
 
-int TrunSnake_byAlpha(struct SnakeMap* map, struct SnakeRelevant* absnake) {
-	int result = absnake->tempdir;
-	int next = map[absnake->head + absnake->tempdir].dir;
-	int x = absnake->x_FoodHead;
-	int y = absnake->y_FoodHead;
+int TrunSnake_byAlpha(struct SnakeMap* map, struct SnakeRelevant* Data) {
+	int result = Data->tempdir;
+	int next = map[Data->head + Data->tempdir].Direction;
+	int x = Data->x_FoodHead;
+	int y = Data->y_FoodHead;
 	int z = x + y;
 	if (y == 0)
 		result = x > 0 ? right : left;
 	if (x == 0)
 		result = y > 0 ? up : down;
 
-	absnake->tempdir = result;
+	Data->tempdir = result;
 	if (!CheakSnakeSafety())
-		switch (absnake->condition)
+		switch (Data->condition)
 		{
 		case 1:
 			return right;
@@ -78,21 +78,21 @@ int TrunSnake_byAlpha(struct SnakeMap* map, struct SnakeRelevant* absnake) {
 			break;
 		}
 
-	absnake->tempdir = result;
-	if (CheakHtoTFSafety(absnake->food, 0)) {
-		if (CheakHtoTFSafety(absnake->tail, absnake->tempdir))
+	Data->tempdir = result;
+	if (CheakHtoTFSafety(Data->food, 0)) {
+		if (CheakHtoTFSafety(Data->tail, Data->tempdir))
 			return result;
 		else
-			return fnAsFarAsThePathtoFood(absnake);
+			return fnFarthestToTheSnakeFood_A(Data);
 	}
 	else
-		return fnAsFarAsThePathtoTail_(absnake);
+		return fnFarthestToTheSnakeTail(Data);
 }
 
-int fnAsFarAsThePathtoFood(SnakeRelevant* absnake)
+int fnFarthestToTheSnakeFood_A(SnakeRelevant* Data)
 {
 	int result = 0;
-	switch (absnake->condition)
+	switch (Data->condition)
 	{
 	case 1:
 		result = right;
@@ -101,79 +101,81 @@ int fnAsFarAsThePathtoFood(SnakeRelevant* absnake)
 		result = down;
 		break;
 	case 3:
-		result = absnake->tempdir == down ? right : down;
+		result = Data->tempdir == down ? right : down;
 		break;
 	case 4:
 		result = up;
 		break;
 	case 5:
-		result = absnake->tempdir == up ? right : up;
+		result = Data->tempdir == up ? right : up;
 		break;
 	case 6:
-		result = absnake->tempdir == up ? down : up;
+		result = Data->tempdir == up ? down : up;
 		break;
 	case 7:
-		if (absnake->tempdir == right)
-			result = CheakHtoTFSafety(absnake->tail, up) ? up : down;
+		if (Data->tempdir == right)
+			result = CheakHtoTFSafety(Data->tail, up) ? up : down;
 		else
-			result = absnake->tempdir == up ? down : up;
+			result = Data->tempdir == up ? down : up;
 		break;
 	case 8:
 		result = left;
 		break;
 	case 9:
-		result = absnake->tempdir == left ? right : left;
+		result = Data->tempdir == left ? right : left;
 		break;
 	case 10:
-		result = absnake->tempdir == left ? down : left;
+		result = Data->tempdir == left ? down : left;
 		break;
 	case 11:
-		if (absnake->tempdir == down)
-			result = CheakHtoTFSafety(absnake->tail, right) ? right : left;
+		if (Data->tempdir == down)
+			result = CheakHtoTFSafety(Data->tail, right) ? right : left;
 		else
-			result = absnake->tempdir == right ? left : right;
+			result = Data->tempdir == right ? left : right;
 		break;
 	case 12:
-		result = absnake->tempdir == left ? up : left;
+		result = Data->tempdir == left ? up : left;
 		break;
 	case 13:
-		if (absnake->tempdir == up)
-			result = CheakHtoTFSafety(absnake->tail, left) ? left : right;
+		if (Data->tempdir == up)
+			result = CheakHtoTFSafety(Data->tail, left) ? left : right;
 		else
-			result = absnake->tempdir == left ? right : left;
+			result = Data->tempdir == left ? right : left;
 		break;
 	case 14:
-		if (absnake->tempdir == left)
-			result = CheakHtoTFSafety(absnake->tail, up) ? up : down;
+		if (Data->tempdir == left)
+			result = CheakHtoTFSafety(Data->tail, up) ? up : down;
 		else
-			result = absnake->tempdir == up ? down : up;
+			result = Data->tempdir == up ? down : up;
 		break;
 	}
 	return result;
 }
 
-int fnAsFarAsThePathtoFood_(SnakeRelevant* absnake)
+int fnFarthestToTheSnakeFood_B(SnakeRelevant* Data)
 {
 	int Dir[4] = { left,right,up,down };
-	int result = absnake->tempdir;
-	int max = 0;
+	int result = Data->tempdir;
+	int max = 0, temp = 0;
 	for (int i = 0; i < 4; i++) {
-		if (CheakHtoTFSafety(absnake->food, Dir[i]) >= max) {
-			max = CheakHtoTFSafety(absnake->food, Dir[i]);
+		temp = CheakHtoTFSafety(Data->food, Dir[i]);
+		if (temp >= max) {
+			max = temp;
 			result = Dir[i];
 		}
 	}
 	return result;
 }
 
-int fnAsFarAsThePathtoTail_(SnakeRelevant* absnake)
+int fnFarthestToTheSnakeTail(SnakeRelevant* Data)
 {
 	int Dir[4] = { left,right,up,down };
-	int result = absnake->tempdir;
-	int max = 0;
+	int result = Data->tempdir;
+	int max = 0, temp = 0;
 	for (int i = 0; i < 4; i++) {
-		if (CheakHtoTFSafety(absnake->tail, Dir[i]) >= max) {
-			max = CheakHtoTFSafety(absnake->tail, Dir[i]);
+		temp = CheakHtoTFSafety(Data->tail, Dir[i]);
+		if (temp >= max) {
+			max = temp;
 			result = Dir[i];
 		}
 	}
