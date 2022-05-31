@@ -1,37 +1,37 @@
 #include"snake.h"
-SnakeMap Map[pmapS];
-SnakeRelevant absnake;
+SnakeMap SNAKE[pmapS];
+SnakeRelevant Data;
 int op;
 int Dir[4] = { left,right,up,down };
-void InitGame() {
+void InitMsp() {
 	for (int i = 0; i < pmapS; i++) {
 		if (i <= pmapW || i % pmapW == 0 || (i + 1) % pmapW == 0 || i >= pmapS - pmapW) {
-			Map[i].adr = SnakeBody;
-			Map[i].dir = unkown;
+			SNAKE[i].Attributes = SnakeBody;
+			SNAKE[i].Direction = unkown;
 		}
 		else {
-			Map[i].adr = i <= initlong + pmapW ? SnakeBody : none;
-			Map[i].dir = i <= initlong + pmapW ? right : unkown;
+			SNAKE[i].Attributes = i <= initlong + pmapW ? SnakeBody : none;
+			SNAKE[i].Direction = i <= initlong + pmapW ? right : unkown;
 		}
 	}
-	absnake.head = initlong + pmapW;
-	absnake.tail = 1 + pmapW;
-	absnake.score = -1;
-	absnake.speed = initspeed;
-	absnake.tempdir = right;
-	absnake.x_FoodHead = 0;
-	absnake.y_FoodHead = 0;
+	Data.head = initlong + pmapW;
+	Data.tail = 1 + pmapW;
+	Data.score = -1;
+	Data.speed = PlayerSpeed;
+	Data.tempdir = right;
+	Data.x_FoodHead = 0;
+	Data.y_FoodHead = 0;
 	AddApple();
 }
 
 void AddApple() {
-	absnake.stepNumber = 0;
-	absnake.food = 0;
+	Data.stepNumber = 0;
+	Data.food = 0;
 	do
-		absnake.food = rand() % pmapS;
-	while (Map[absnake.food].adr != none);
-	Map[absnake.food].adr = apple;
-	absnake.score++;
+		Data.food = rand() % pmapS;
+	while (SNAKE[Data.food].Attributes != none);
+	SNAKE[Data.food].Attributes = apple;
+	Data.score++;
 	//printf("\a");
 }
 
@@ -40,105 +40,103 @@ void TrunSnake(bool isHuman_AI, bool isD)
 	if (isHuman_AI) {
 		if (isD && _kbhit())
 			system("pause");
-		absnake.tempdir = TrunSnake_byAlpha(Map, &absnake);
+		Data.tempdir = TrunSnake_byAlpha(SNAKE, &Data);
 	}
 	else
-		absnake.tempdir = TrunSnake_byPlayer(absnake.tempdir);
+		Data.tempdir = TrunSnake_byPlayer(Data.tempdir);
 }
 
 bool CheakSnakeSafety()
 {
 	bool su = false;
 	for (int i = 0; i < pmapS; i++)
-		if (Map[i].adr == none) {
+		if (SNAKE[i].Attributes == none || SNAKE[i].Attributes == apple) {
 			su = true;
 			break;
 		}
-	if (absnake.stepNumber > 2 * pmapS)
+	if (Data.stepNumber > 2 * pmapS)
 		return false;
-	int Next = absnake.head + absnake.tempdir;
-	if (su && (Map[Next].adr == none || Next == absnake.food || Next == absnake.tail))
+	int Next = Data.head + Data.tempdir;
+	if (su && (SNAKE[Next].Attributes == none || Next == Data.food || Next == Data.tail))
 		return true;
 
 	return false;
 }
 
-int CheakHtoTFSafety(int end, int dir)
+int CheakHtoTFSafety(int end, int Direction)
 {
 	int nway = 1;
 	op = false;
 	for (int i = 0; i < pmapS; i++) {
-		if (Map[i].adr == SnakeBody)
-			Map[i].way = -1;
+		if (SNAKE[i].Attributes == SnakeBody)
+			SNAKE[i].Number = -1;
 		else
-			Map[i].way = 0;
+			SNAKE[i].Number = 0;
 		if (i == end)
-			Map[i].way = -2;
-		else if (i == absnake.head + dir && (!dir || Map[i].adr != SnakeBody))
-			Map[i].way = nway;
+			SNAKE[i].Number = -2;
+		else if (i == Data.head + Direction && (!Direction || SNAKE[i].Attributes != SnakeBody))
+			SNAKE[i].Number = nway;
 	}
 	while (1)
-		if (update(++nway))
+		if (fnNextCheck(++nway))
 			break;
 	return op;
 }
 
-bool update(int n)
+bool fnNextCheck(int n)
 {
 	int record = 1;
 	for (int i = 0; i < pmapS; i++)
-		if (Map[i].way == (n - 1)) {
-			around(i, n);
+		if (SNAKE[i].Number == (n - 1)) {
+			fnAroundCheak(i, n);
 			record = 0;
 		}
 	return record;
 }
 
-void around(int num, int nway) {
+void fnAroundCheak(int num, int nway) {
 	for (int i = 0; i < 4; i++) {
-		if (Map[num + Dir[i]].way == -2) {
+		if (SNAKE[num + Dir[i]].Number == -2) {
 			op = nway;
 			break;
 		}
-		if (Map[num + Dir[i]].way == 0)
-			Map[num + Dir[i]].way = nway;
+		if (SNAKE[num + Dir[i]].Number == 0)
+			SNAKE[num + Dir[i]].Number = nway;
 	}
 }
 
-void DrewSnake(bool op) {
+void fnDisplaySnake(bool op) {
 	BeginBatchDraw();
-	fnDrawSnakeBody(Map, &absnake);
-	fnOutputMessage(Map, &absnake);
+	fnDrawSnakeBody(SNAKE, &Data);
+	fnOutputMessage(&Data, op);
 	EndBatchDraw();
-	SpeedSnake(op, &absnake);
+	SpeedSnake(op, &Data);
 }
 
 void MoveSnake() {
-	if (Map[absnake.head + absnake.tempdir].adr != apple) {
-		MoveSnake_Tail(Map, &absnake.tail);
-		absnake.stepNumber++;
+	if (SNAKE[Data.head + Data.tempdir].Attributes != apple) {
+		MoveSnake_Tail(SNAKE, &Data.tail);
+		Data.stepNumber++;
 	}
 	else
 		AddApple();
-	MoveSnake_Head(Map, &absnake.tempdir, &absnake.head);
+	MoveSnake_Head(SNAKE, &Data.tempdir, &Data.head);
 
 	fnRefresh();
 }
 
 void fnRefresh()
 {
-	absnake.x_FoodHead = ManHaadun_x(absnake.food, absnake.head);
-	absnake.y_FoodHead = ManHaadun_y(absnake.head, absnake.food);
-	absnake.x_TailHead = ManHaadun_x(absnake.tail, absnake.head);
-	absnake.y_TailHead = ManHaadun_y(absnake.head, absnake.tail);
-	absnake.condition = _condition(absnake.head);
+	Data.x_FoodHead = ManHaadun_x(Data.food, Data.head);
+	Data.y_FoodHead = ManHaadun_y(Data.head, Data.food);
+	Data.condition = getSquareSafetyFactor(Data.head);
 }
 
-double completeness() {
-	return (absnake.score + initlong + 1) / (float)mapSize;
+double debuggingResults() {
+	return (Data.score + initlong + 1) / (float)mapSize;
 }
 
 int isSnakeBody(int op)
 {
-	return (Map[op].adr == none || op == absnake.food || op == absnake.tail) ? 1 : 0;
+	return (SNAKE[op].Attributes == none || op == Data.food || op == Data.tail) ? 1 : 0;
 }
