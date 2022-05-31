@@ -1,63 +1,63 @@
-#include"snake.h"
+#include"Drew.h"
 
 void DISPLAY_DESK() {
 
-	initgraph(screenWidth, screenHigh, 1);
+	initgraph(screenWidth, screenHigh);
 
 	setbkcolor(WHITE);
 	cleardevice();
 
 	settextcolor(0xFFFF00);
-	settextstyle(70, 35, L"¿¬Ìå");
-	outtextxy(110, 70, L"Ì°");
-	outtextxy(386, 70, L"³Ô");
-	outtextxy(660, 70, L"Éß");
+	settextstyle(70, 35, L"æ¥·ä½“");
+	outtextxy(110, 70, L"è´ª");
+	outtextxy(386, 70, L"åƒ");
+	outtextxy(660, 70, L"è›‡");
 
 	settextcolor(0xAAAA00);
-	settextstyle(40, 0, L"¿¬Ìå");
-	outtextxy(290, 220, L"A  ¿ªÊ¼ÓÎÏ·");
-	outtextxy(290, 300, L"B  ¹Û²ìÄ£Ê½");
-	outtextxy(290, 380, L"C  ÓÎÏ·°ïÖú");
+	settextstyle(40, 0, L"æ¥·ä½“");
+	outtextxy(290, 220, L"A  å¼€å§‹æ¸¸æˆ");
+	outtextxy(290, 300, L"B  è§‚å¯Ÿæ¨¡å¼");
+	outtextxy(290, 380, L"C  æ¸¸æˆå¸®åŠ©");
 
 }
 
-void fnDrawSnakeBody(SnakeMap* map, SnakeRelevant* absnake) {
+void fnDrawSnakeBody(SnakeMap* map, SnakeRelevant* Data) {
 	int xh = 0;
 	int yh = 0;
 
-	//ÇåÆÁ
+	//æ¸…å±
 	cleardevice();
 
-	//ÆÌµ×É«
+	//é“ºåº•è‰²
 	setfillcolor(none);
 	solidrectangle(MapBorderA_x, MapBorderA_y, MapBorderB_x, MapBorderB_y);
 
 	for (int i = pmapW + 1; i < pmapS - pmapW; i++) {
-		//Ìø¹ı±ß½çºÍ¿Õ·½¿ìµÄ»æ»­
-		if (i % pmapW == 0 || i % pmapW == pmapW - 1 || map[i].adr == none)
+		//è·³è¿‡è¾¹ç•Œå’Œç©ºæ–¹å¿«çš„ç»˜ç”»
+		if (i % pmapW == 0 || i % pmapW == pmapW - 1 || map[i].Attributes == none)
 			continue;
-		//¸üĞÂ×ø±ê
+		//æ›´æ–°åæ ‡
 		xh = DrewStartPoint_x + (i % pmapW) * cellWidth;
 		yh = DrewStartPoint_y + (i / pmapW) * cellWidth;
-		//»æ»­Ê³Îï
-		if (i == absnake->food) {
+		//ç»˜ç”»é£Ÿç‰©
+		if (i == Data->food) {
 			setfillcolor(apple);
 			solidrectangle(xh, yh, xh + cellWidth - cellGap, yh + cellWidth - cellGap);
 			continue;
 		}
-		//»æ»­ÉßÍ·
-		if (i == absnake->head) {
+		//ç»˜ç”»è›‡å¤´
+		if (i == Data->head) {
 			setfillcolor(LIGHTBLUE);
 			solidrectangle(xh, yh, xh + cellWidth - cellGap, yh + cellWidth - cellGap);
 			continue;
 		}
-		//ÉßÉí
-		if (i == absnake->tail)
+		//è›‡èº«
+		if (i == Data->tail)
 			setfillcolor(RED);
 		else
 			setfillcolor(SnakeBody);
-		//Í»Æğ½áµãÒÔÁ¬½Ó¸ö¸ö·½¿é
-		switch (map[i].dir)
+		//çªèµ·ç»“ç‚¹ä»¥è¿æ¥ä¸ªä¸ªæ–¹å—
+		switch (map[i].Direction)
 		{
 		case left:
 			solidrectangle(xh - cellGap, yh, xh + cellWidth - cellGap, yh + cellWidth - cellGap);
@@ -79,9 +79,9 @@ void fnDrawSnakeBody(SnakeMap* map, SnakeRelevant* absnake) {
 
 }
 
-void fnOutputMessage(SnakeMap* map, SnakeRelevant* absnake)
+void fnOutputMessage(SnakeRelevant* Data, bool op)
 {
-	//ºÚ±ß¿ò
+	//é»‘è¾¹æ¡†
 	setlinecolor(BLACK);
 	setlinestyle(PS_SOLID, 2);
 	rectangle(MapBorderA_x, MapBorderA_y, MapBorderB_x, MapBorderB_y);
@@ -90,18 +90,24 @@ void fnOutputMessage(SnakeMap* map, SnakeRelevant* absnake)
 	line(outputMessageA_x, outputMessageAB_y, outputMessageB_x, outputMessageAB_y);
 
 	setbkmode(TRANSPARENT);
-	settextstyle(MessageWidth, MessageWidth / 2, L"Î¢ÈíÑÅºÚ");
-	wchar_t str[80];
-	swprintf_s(str, 
-		L"score:%3d|step:%3d|fxy(%3d,%3d,%1d)|txy(%3d,%3d,%1d)|spe:%%%2.0lf",
-		absnake->score,
-		absnake->stepNumber,
-		absnake->x_FoodHead,
-		absnake->y_FoodHead,
-		CheakHtoTFSafety(absnake->food, 0),
-		absnake->x_TailHead,
-		absnake->y_TailHead,
-		CheakHtoTFSafety(absnake->tail, 0),
-		(initspeed - absnake->speed) * 100 / initspeed);
-	outtextxy(outputMessage__x, outputMessageAB_y - MessageWidth - cellGap, str);
+	settextstyle(MessageWidth, MessageWidth / 2, L"å¾®è½¯é›…é»‘");
+	wchar_t str[50];
+	if(op)
+		swprintf_s(str, 
+			L"score%3d|Dir%2d|step%3d|fxy%3d|txy%3d",
+			(int)(100 * debuggingResults()),
+			Data->tempdir,
+			Data->stepNumber,
+			CheakHtoTFSafety(Data->food, 0),
+			CheakHtoTFSafety(Data->tail, 0)
+		);
+	else
+		swprintf_s(str, 
+			L"score:%3d|spe:%%%2d|fxy(%3d,%3d)",
+			Data->score,
+			(int)(PlayerSpeed - Data->speed) * 100 / PlayerSpeed,
+			Data->x_FoodHead,
+			Data->y_FoodHead
+		);
+	outtextxy(outputMessage__x, outputMessageAB_y - MessageWidth - 2, str);
 }
