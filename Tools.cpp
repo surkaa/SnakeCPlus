@@ -7,25 +7,25 @@ int ManHaadun_y(int a, int b) {
 	return a / pmapW - b / pmapW;
 }
 
-int TrunSnake_byPlayer(int dir) {
-	int result = dir;
+int TrunSnake_byPlayer(int Direction) {
+	int result = Direction;
 	if (_kbhit())
 		switch (_getch())
 		{
 		case 77:case'a':case'A':case'3':
-			if (dir != right)
+			if (Direction != right)
 				result = left;
 			break;
 		case 72:case'w':case'W':case'1':
-			if (dir != down)
+			if (Direction != down)
 				result = up;
 			break;
 		case 80:case's':case'S':case'2':
-			if (dir != up)
+			if (Direction != up)
 				result = down;
 			break;
 		case 75:case'd':case'D':case'4':
-			if (dir != left)
+			if (Direction != left)
 				result = right;
 			break;
 		default:
@@ -37,19 +37,19 @@ int TrunSnake_byPlayer(int dir) {
 }
 
 void MoveSnake_Head(SnakeMap* map, int* tempdir, int* head) {
-	map[*head].dir = *tempdir;
+	map[*head].Direction = *tempdir;
 	*head += *tempdir;
-	map[*head].adr = SnakeBody;
+	map[*head].Attributes = SnakeBody;
 }
 
 void MoveSnake_Tail(SnakeMap* map, int* tail) {
 	int temp = *tail;
-	*tail += map[temp].dir;
-	map[temp].adr = none;
-	map[temp].dir = unkown;
+	*tail += map[temp].Direction;
+	map[temp].Attributes = none;
+	map[temp].Direction = unkown;
 }
 
-int _condition(int head) {
+int getSquareSafetyFactor(int head) {
 	int result =
 		8 * isSnakeBody(head + left) +
 		4 * isSnakeBody(head + up) +
@@ -59,9 +59,11 @@ int _condition(int head) {
 	return result;
 }
 
-void SpeedSnake(bool op, SnakeRelevant* absnake) {
-	//ÎªÊ¹·ÖÊı´ïÂúÊ±µÃµ½ËÙ¶È speed = 1 ¼ÆËãµÃÏµÊı SpeedRelationship ÈçÏÂ
-	if(!op)
-		absnake->speed = (initspeed * pow(2, -absnake->score * SpeedRelationship));
-	Sleep((DWORD)absnake->speed);
+void SpeedSnake(bool op, SnakeRelevant* Data) {
+	if (op)
+		Data->speed = AISpeed;
+	else
+//		ä¸ºä½¿åˆ†æ•°è¾¾æ»¡æ—¶å¾—åˆ°é€Ÿåº¦ speed = 1 è®¡ç®—å¾—ç³»æ•° SpeedRelationship å¦‚ä¸‹
+		Data->speed = (int)(PlayerSpeed * pow(2, -Data->score * SpeedRelationship));
+	Sleep((DWORD)Data->speed);
 }
